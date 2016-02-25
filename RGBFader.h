@@ -42,6 +42,8 @@ public:
 
   static const RGB rainbow[];
   static const uint8_t rainbowSize;
+  static const RGB rainbowAndWhite[];
+  static const uint8_t rainbowAndWhiteSize;
   static const RGB redGreenBlue[];
   static const uint8_t redGreenBlueSize;
   
@@ -50,6 +52,7 @@ public:
   RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colorsNum, const uint8_t color_steps = 64, const uint8_t brightness_speed = 4, 
            const uint8_t initialBrightness = 255, const bool colorCycle = false, curveType curve = EXPONENTIAL);
   void nextStep();
+  void goOnColorIndex(uint8_t index);
   
   static inline void linear(int pin, uint8_t value) {
     analogWrite(pin, value);
@@ -123,6 +126,7 @@ protected:
   RGB colors[MAX_COLORS];
   uint8_t colorsNum;
   RGB color;
+  RGB tempColor;
   uint8_t brightness;
   uint8_t brightnessTarget;
   uint8_t cycleBrightnessTarget;
@@ -130,6 +134,7 @@ protected:
   uint8_t finalPauseCycles;
   uint8_t position;
   bool colorEnded;
+  bool oneshot;
 
   void setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint8_t offset);
 

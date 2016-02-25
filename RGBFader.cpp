@@ -29,6 +29,17 @@ const RGB RGBFader::rainbow[] = { {255, 0,   0   },
 
 const uint8_t RGBFader::rainbowSize = 7;
 
+const RGB RGBFader::rainbowAndWhite[] = { {255, 0,   0   },
+                                          {255, 127, 0   },
+                                          {255, 255, 0   },
+                                          {0,   255, 0   },
+                                          {0,   0,   255 },
+                                          {75,  0,   130 },
+                                          {139, 0,   255 },
+                                          {255, 214, 170 } };
+
+const uint8_t RGBFader::rainbowAndWhiteSize = 8;
+
 const RGB RGBFader::redGreenBlue[] = { {255, 0,   0   },
                                        {0,   255, 0   },
                                        {0,   0,   255 } };
@@ -66,7 +77,8 @@ RGBFader::RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colors
   brightnessTarget(initialBrightness),
   cycleBrightnessTarget(initialBrightness),
   cycleBrightness(false),
-  finalPauseCycles(0)
+  finalPauseCycles(0),
+  oneshot(false)
 {
   setColors(colors, colorsNum);
 }
@@ -83,6 +95,15 @@ void RGBFader::setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint
   color = colors[0];
   colorEnded = false;
 
+}
+
+void RGBFader::goOnColorIndex(uint8_t index) {
+  tempColor = color;
+  prevColor = &tempColor;
+  nextColor = colors + index;
+  colorEnded = false;
+  position = 0;
+  oneshot = true;
 }
 
 void RGBFader::nextStep() {
@@ -102,6 +123,10 @@ void RGBFader::nextStep() {
     if (position == 0) {
       prevColor = nextColor;
       nextColor = (nextColor - colors + 1) % colorsNum + colors;
+      if (oneshot) {
+        oneshot = false;
+        colorEnded = true;
+      }
     }
 
     changed = true;
