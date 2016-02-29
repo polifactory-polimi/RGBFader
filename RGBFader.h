@@ -49,8 +49,8 @@ public:
   
   static const uint8_t exponentialLookup[256];
   
-  RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colorsNum, const uint8_t color_steps = 64, const uint8_t brightness_speed = 4, 
-           const uint8_t initialBrightness = 255, const bool colorCycle = false, curveType curve = EXPONENTIAL);
+  RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colorsNum, const uint8_t color_steps = 64, const uint8_t start_color = 0,
+           const uint8_t brightness_speed = 4, const uint8_t initialBrightness = 255, const bool colorCycle = false, curveType curve = EXPONENTIAL);
   void nextStep();
   void goOnColorIndex(uint8_t index);
   
@@ -73,21 +73,21 @@ public:
 */
 
   inline void setColors(const RGB colors[], const uint8_t colorsNum) {
-    setColorsOffset(colors, colorsNum, 0);
+    setColorsOffset(colors, colorsNum, 0, 0);
   }
 
   inline void setColors(const RGB& colors) {
-    setColorsOffset(&colors, 1, 0);
+    setColorsOffset(&colors, 1, 0, 0);
   }
   
   inline void setNextColors(const RGB colors[], const uint8_t colorsNum) {
     this->colors[0] = color;
-    setColorsOffset(colors, colorsNum, 1);
+    setColorsOffset(colors, colorsNum, 1, 0);
   }
 
   inline void setNextColors(const RGB& colors) {
     this->colors[0] = color;
-    setColorsOffset(&colors, 1, 1);
+    setColorsOffset(&colors, 1, 1, 0);
   }
 
   inline RGB getColor() {
@@ -108,6 +108,10 @@ public:
 
   inline uint8_t getBrightness() {
     return brightness;
+  }
+
+  inline uint8_t getBrightnessTarget() {
+    return brightnessTarget;
   }
 
   bool colorCycle;
@@ -134,9 +138,9 @@ protected:
   uint8_t finalPauseCycles;
   uint8_t position;
   bool colorEnded;
-  bool oneshot;
+  bool colorOneshot;
 
-  void setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint8_t offset);
+  void setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint8_t offset, uint8_t start_color);
 
   inline void applyChanges() {
     curveFunction(pins.red, map(color.red, 0, 255, 0, brightness));

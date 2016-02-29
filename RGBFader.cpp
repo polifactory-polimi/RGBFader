@@ -64,8 +64,8 @@ const uint8_t RGBFader::exponentialLookup[] PROGMEM =
   0x81, 0x84, 0x87, 0x8A, 0x8D, 0x90, 0x94, 0x97, 0x9A, 0x9E, 0xA1, 0xA5, 0xA8, 0xAC, 0xB0, 0xB4,
   0xB8, 0xBC, 0xC0, 0xC4, 0xC9, 0xCD, 0xD1, 0xD6, 0xDB, 0xE0, 0xE5, 0xEA, 0xEF, 0xF4, 0xF9, 0xFF };
 
-RGBFader::RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colorsNum, const uint8_t color_steps, const uint8_t brightness_speed,
-                   const uint8_t initialBrightness, const bool colorCycle, curveType curve) :
+RGBFader::RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colorsNum, const uint8_t color_steps, const uint8_t start_color,
+                   const uint8_t brightness_speed, const uint8_t initialBrightness, const bool colorCycle, curveType curve) :
   colorCycle(colorCycle),
   freezeColor(false),
   freezeBrightness(false),
@@ -78,18 +78,19 @@ RGBFader::RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colors
   cycleBrightnessTarget(initialBrightness),
   cycleBrightness(false),
   finalPauseCycles(0),
-  oneshot(false)
+  colorOneshot(false)
 {
-  setColors(colors, colorsNum);
+  setColorsOffset(colors, colorsNum, 0, start_color);
+  nextStep();
 }
 
-void RGBFader::setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint8_t offset) {
+void RGBFader::setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint8_t offset, uint8_t start_color) {
 
   for (uint8_t i = 0; i < colorsNum; i++)
     this->colors[i + offset] = colors[i];
   
   this->colorsNum = colorsNum + offset;
-  prevColor = this->colors;
+  prevColor = this->colors + start_color;
   nextColor = (prevColor - this->colors + 1) % colorsNum + this->colors;
   position = 0;
   color = colors[0];
@@ -103,13 +104,13 @@ void RGBFader::goOnColorIndex(uint8_t index) {
   nextColor = colors + index;
   colorEnded = false;
   position = 0;
-  oneshot = true;
+  colorOneshot = true;
 }
 
 void RGBFader::nextStep() {
   bool changed = false;
   
-  if ((!colorEnded || colorCycle) && !freezeColor) {   
+  if (((!colorEnded || colorCycle) && !freezeColor) || colorOneshot) {   
     color.red = map(position, 0, color_steps, prevColor->red, nextColor->red);
     color.green = map(position, 0, color_steps, prevColor->green, nextColor->green);
     color.blue = map(position, 0, color_steps, prevColor->blue, nextColor->blue);
@@ -123,8 +124,8 @@ void RGBFader::nextStep() {
     if (position == 0) {
       prevColor = nextColor;
       nextColor = (nextColor - colors + 1) % colorsNum + colors;
-      if (oneshot) {
-        oneshot = false;
+      if (colorOneshot) {
+        colorOneshot = false;
         colorEnded = true;
       }
     }
