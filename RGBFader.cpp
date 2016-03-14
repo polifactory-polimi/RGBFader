@@ -71,14 +71,14 @@ RGBFader::RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colors
   freezeBrightness(false),
   pins(rgb_pins),
   color_steps(color_steps),
-  brightness_speed(brightness_speed),
   curveFunction(curve == LINEAR ? linear : (curve == QUADRATIC ? quadratic : exponential)),
   brightness(initialBrightness),
   brightnessTarget(initialBrightness),
   cycleBrightnessTarget(initialBrightness),
   cycleBrightness(false),
   finalPauseCycles(0),
-  colorOneshot(false)
+  colorOneshot(false),
+  brightness_speed(brightness_speed)
 {
   setColorsOffset(colors, colorsNum, 0, start_color);
   nextStep();

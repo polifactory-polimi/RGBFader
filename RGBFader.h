@@ -114,6 +114,10 @@ public:
     return brightnessTarget;
   }
 
+  inline void setBrightnessSpeed(uint8_t brightness_speed) {
+    this->brightness_speed = brightness_speed;
+  }
+
   bool colorCycle;
   bool freezeColor;
   bool freezeBrightness;
@@ -121,7 +125,6 @@ public:
 protected:
   const RGB pins;
   const uint8_t color_steps;
-  const uint8_t brightness_speed;
   void (*const curveFunction)(int, uint8_t);
   
   const RGB *prevColor;
@@ -139,6 +142,7 @@ protected:
   uint8_t position;
   bool colorEnded;
   bool colorOneshot;
+  uint8_t brightness_speed;
 
   void setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint8_t offset, uint8_t start_color);
 
