@@ -21,6 +21,12 @@
 
 #define MAX_COLORS 16
 
+#ifdef PWMRANGE //ESP8266
+#define RGB_PWMRANGE PWMRANGE
+#else
+#define RGB_PWMRANGE 255
+#endif
+
 class RGB {
 public:
   uint8_t red;
@@ -55,20 +61,20 @@ public:
   void goOnColorIndex(uint8_t index);
   
   static inline void linear(int pin, uint8_t value) {
-    analogWrite(pin, value);
+    analogWrite(pin, map(value, 0, 255, 0, RGB_PWMRANGE));
   }
 
   static inline void quadratic(int pin, uint8_t value) {
-    analogWrite(pin, map((uint16_t)(value)*value, 0, 65025, 0, 255));
+    analogWrite(pin, map((uint16_t)(value)*value, 0, 65025, 0, RGB_PWMRANGE));
   }
 
   static inline void exponential(int pin, uint8_t value) {
-    analogWrite(pin, pgm_read_byte_near(exponentialLookup + value));
+    analogWrite(pin, map(pgm_read_byte_near(exponentialLookup + value), 0, 255, 0, RGB_PWMRANGE));
   }
 
 /*
   static inline void exponential(int pin, uint8_t value) {
-    analogWrite(pin, round(pow(2, value / 31.875)) - 1);
+    analogWrite(pin, round(pow(2, value / 31.75)) - 1);
   }
 */
 
