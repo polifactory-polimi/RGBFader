@@ -124,6 +124,10 @@ public:
     this->brightness_speed = brightness_speed;
   }
 
+  inline bool getColorEnded() {
+    return colorEnded;
+  }
+
   bool colorCycle;
   bool freezeColor;
   bool freezeBrightness;
