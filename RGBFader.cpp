@@ -94,7 +94,7 @@ void RGBFader::setColorsOffset(const RGB colors[], const uint8_t colorsNum, uint
   nextColor = (prevColor - this->colors + 1) % colorsNum + this->colors;
   position = 0;
   color = colors[0];
-  if (colorsNum == 1)
+  if (this->colorsNum == 1)
     colorEnded = true;
   else
     colorEnded = false;
