@@ -52,8 +52,12 @@ public:
   static const uint8_t rainbowAndWhiteSize;
   static const RGB redGreenBlue[];
   static const uint8_t redGreenBlueSize;
-  
+
+#if RGB_PWMRANGE>=256
+  static const uint16_t exponentialLookup[256];
+#else
   static const uint8_t exponentialLookup[256];
+#endif
   
   RGBFader(const RGB& rgb_pins, const RGB colors[], const uint8_t colorsNum, const uint8_t color_steps = 64, const uint8_t start_color = 0,
            const uint8_t brightness_speed = 4, const uint8_t initialBrightness = 255, const bool colorCycle = false, curveType curve = EXPONENTIAL);
@@ -69,7 +73,11 @@ public:
   }
 
   static inline void exponential(int pin, uint8_t value) {
-    analogWrite(pin, map(pgm_read_byte_near(exponentialLookup + value), 0, 255, 0, RGB_PWMRANGE));
+#if RGB_PWMRANGE>=256
+    analogWrite(pin, map(pgm_read_word_near(&(exponentialLookup[value])), 0, 65535, 0, RGB_PWMRANGE));
+#else
+    analogWrite(pin, map(pgm_read_byte_near(&(exponentialLookup[value])), 0, 255, 0, RGB_PWMRANGE));
+#endif
   }
 
 /*
